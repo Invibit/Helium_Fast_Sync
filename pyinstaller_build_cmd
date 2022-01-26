@@ -1,0 +1,1 @@
+pyinstaller --onefile --windowed --icon='files/helium.ico' updateGUI.py
