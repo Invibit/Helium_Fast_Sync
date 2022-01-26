@@ -1,1 +1,3 @@
-pyinstaller --onefile --windowed --icon='files/helium.ico' updateGUI.py
+in a directory with both source scripts, assets and config folders, run:
+
+pyinstaller --onefile --windowed --icon='assets/helium.ico' fast_sync_GUI.py
