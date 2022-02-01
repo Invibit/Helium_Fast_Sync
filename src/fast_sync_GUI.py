@@ -29,8 +29,8 @@ class heliumUpdateGUI(tk.Tk):
         self.iconbitmap(default='assets/helium.ico')
         self.optionspath = 'config/options.config'
         self.savepath = 'log.txt'
-        self.WIDTH = 1200
-        self.HEIGHT = 800 
+        self.WIDTH = 900
+        self.HEIGHT = 500 
         self.s = ssh_comms.ssh_comms()
         self.gui()
 
@@ -43,10 +43,10 @@ class heliumUpdateGUI(tk.Tk):
             'cmd txt' : tkFont.Font(family='Consolas', size=13, weight='normal')
         }
         canvas = tk.Canvas(self, width=self.WIDTH, height=self.HEIGHT, bg=self.colors['light gray'])
-        canvas.pack()
+        canvas.pack(fill='both', expand=True)
 
-        self.fbdata = tk.Text(canvas, bg=self.colors['light gray'], font=self.font['cmd txt'], relief='groove')
-        self.fbdata.insert('end', 'Version: 1.2 | Built 1.27.00\n\n')
+        self.fbdata = tk.Text(canvas, bg=self.colors['white'], font=self.font['cmd txt'], relief='groove')
+        self.fbdata.insert('end', '   Version: 1.2 | Built 01.02.22\n\n')
         self.fbdata.configure(state='disabled')
         self.fbdata.place(anchor='n', relx=0.5, rely=0.07, relwidth=0.98, relheight=0.84)
 
@@ -58,13 +58,13 @@ class heliumUpdateGUI(tk.Tk):
                                     relief='groove', activebackground=self.colors['light gray'], command=self.update_but_func)
         self.update_but.bind('<Enter>', lambda event, x=self.update_but:self.on_hover(x))
         self.update_but.bind('<Leave>', lambda event, x=self.update_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.update_but.place(anchor='n', relx=0.1, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.update_but.place(anchor='n', relx=0.14, rely=0.92, relwidth=0.17, relheight=0.07)
         
         self.quagga_but = tk.Button(canvas,  text='2. Quagga Restart', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
                                     relief='groove', activebackground=self.colors['light gray'], command=self.quagga_but_func)
         self.quagga_but.bind('<Enter>', lambda event, x=self.quagga_but:self.on_hover(x))
         self.quagga_but.bind('<Leave>', lambda event, x=self.quagga_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.quagga_but.place(anchor='n', relx=0.3, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.quagga_but.place(anchor='n', relx=0.32, rely=0.92, relwidth=0.17, relheight=0.07)
 
         self.status_but = tk.Button(canvas,  text='3. Status', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
                                     relief='groove', activebackground=self.colors['light gray'], command=self.status_but_func)
@@ -76,29 +76,32 @@ class heliumUpdateGUI(tk.Tk):
                                     relief='groove', activebackground=self.colors['light gray'], command=self.miner_info_func)
         self.status_but.bind('<Enter>', lambda event, x=self.status_but:self.on_hover(x))
         self.status_but.bind('<Leave>', lambda event, x=self.status_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.status_but.place(anchor='n', relx=0.7, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.status_but.place(anchor='n', relx=0.68, rely=0.92, relwidth=0.17, relheight=0.07)
 
         self.status_but = tk.Button(canvas,  text='5. Peer Book', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
                                     relief='groove', activebackground=self.colors['light gray'], command=self.run_peer_book_func)
         self.status_but.bind('<Enter>', lambda event, x=self.status_but:self.on_hover(x))
         self.status_but.bind('<Leave>', lambda event, x=self.status_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.status_but.place(anchor='n', relx=0.9, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.status_but.place(anchor='n', relx=0.86, rely=0.92, relwidth=0.17, relheight=0.07)
 
-        iplb = tk.Label(canvas, text='Enter IP :', font=self.font['bold'], bg=self.colors['light gray'])
-        iplb.place(anchor='n', relx=0.05, rely=0.005, relwidth=0.08, relheight=0.06)
+        iplb = tk.Label(canvas, text='IP :', font=self.font['bold'], bg=self.colors['light gray'])
+        iplb.place(anchor='n', relx=0.03, rely=0.005, relwidth=0.03, relheight=0.06)
 
-        init_ip = '10.1.1.11'
+        init_ip = '192.168.1.X'
         self.ipEntry = tk.Entry(canvas, font=self.font['bold'], justify='center', bg=self.colors['white'])
         self.ipEntry.insert('end', init_ip)
-        self.ipEntry.place(anchor='n', relx=0.16, rely=0.012, relwidth=0.13, relheight=0.05)
+        self.ipEntry.place(anchor='n', relx=0.12, rely=0.012, relwidth=0.13, relheight=0.05)
 
-        iplb = tk.Label(canvas, text='SSH Port :', font=self.font['bold'], bg=self.colors['light gray'])
-        iplb.place(anchor='n', relx=0.30, rely=0.005, relwidth=0.08, relheight=0.06)
+        separator = ttk.Separator(canvas, orient='vertical')
+        separator.place(relx=0.2, rely=0.003, relwidth=0.001, relheight=0.06)
+
+        portlb = tk.Label(canvas, text='SSH port :', font=self.font['bold'], bg=self.colors['light gray'])
+        portlb.place(anchor='n', relx=0.255, rely=0.005, relwidth=0.08, relheight=0.06)
 
         init_port = '22'
         self.portEntry = tk.Entry(canvas, font=self.font['bold'], justify='center', bg=self.colors['white'])
         self.portEntry.insert('end', init_port)
-        self.portEntry.place(anchor='n', relx=0.36, rely=0.012, relwidth=0.03, relheight=0.05)
+        self.portEntry.place(anchor='n', relx=0.334, rely=0.012, relwidth=0.05, relheight=0.05)
 
         # add logo img
         logo = Image.open('assets/invibit.png')
@@ -106,10 +109,10 @@ class heliumUpdateGUI(tk.Tk):
         logo = ImageTk.PhotoImage(logo)
         logolb = tk.Label(canvas, image=logo, bg=self.colors['light gray'])
         logolb.image = logo
-        logolb.place(anchor='n', relx=0.77, rely=0.003, relwidth=0.11, relheight=0.058)
+        logolb.place(anchor='n', relx=0.77, rely=0.004, relwidth=0.11, relheight=0.058)
 
-        separator = ttk.Separator(canvas, orient='vertical')
-        separator.place(relx=0.83, rely=0.003, relwidth=0.001, relheight=0.06)
+        separator2 = ttk.Separator(canvas, orient='vertical')
+        separator2.place(relx=0.83, rely=0.003, relwidth=0.001, relheight=0.06)
 
         mlogo = Image.open('assets/milesight.png')
         mlogo = mlogo.resize((130, 95), Image.ANTIALIAS)
@@ -236,7 +239,6 @@ class heliumUpdateGUI(tk.Tk):
         self.update_fbdata(f'*** DONE ***\n')
         self.s.disconnect()
 
-
     def run_status_cmd(self):
         cmd = 'docker exec miner miner info p2p_status'
         self.update_fbdata(f'${cmd}\n')
@@ -267,6 +269,9 @@ class heliumUpdateGUI(tk.Tk):
     def conn_sequence(self):
         addr = self.ipEntry.get()
         port = self.portEntry.get()
+        if not self.valid_port(port):
+            self.throw_custom_error(title='Error', message='Invalid SSH port. Range : [0, 255].')
+            return None
         if addr[-1] == 'X':
             self.throw_custom_error(title='Error', message='Enter device IP address.')
             return None
@@ -313,6 +318,13 @@ class heliumUpdateGUI(tk.Tk):
             return True
         except ValueError:
             return False
+    
+    def valid_port(self, port):
+        try:
+            port = int(port)
+            return (port >= 0 and port <=255)
+        except:
+            return False
 
     def read_config(self):
         if os.path.isfile(self.optionspath) and os.path.getsize(self.optionspath) > 0:
@@ -351,6 +363,7 @@ class heliumUpdateGUI(tk.Tk):
 
 if __name__ == '__main__':
     gui = heliumUpdateGUI()
-    gui.resizable(False, False)
+    gui.resizable(True, True)
+    gui.minsize(900, 500)
     gui.protocol('WM_DELETE_WINDOW', gui.exit)
     gui.mainloop()
