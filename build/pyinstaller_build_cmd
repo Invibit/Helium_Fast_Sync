@@ -1,3 +1,6 @@
 in a directory with both source scripts, assets and config folders, run:
 
-pyinstaller --onefile --windowed --icon='assets/helium.ico' fast_sync_GUI.py
+pyinstaller --onefile --windowed --icon='assets/helium.ico' src/fast_sync_GUI.py
+
+on windows machine:
+pyinstaller --onefile --windowed --icon=assets\helium.ico src\fast_sync_GUI.py

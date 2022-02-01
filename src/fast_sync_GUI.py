@@ -29,8 +29,8 @@ class heliumUpdateGUI(tk.Tk):
         self.iconbitmap(default='assets/helium.ico')
         self.optionspath = 'config/options.config'
         self.savepath = 'log.txt'
-        self.WIDTH = 900
-        self.HEIGHT = 500 
+        self.WIDTH = 1200
+        self.HEIGHT = 800 
         self.s = ssh_comms.ssh_comms()
         self.gui()
 
@@ -46,7 +46,7 @@ class heliumUpdateGUI(tk.Tk):
         canvas.pack()
 
         self.fbdata = tk.Text(canvas, bg=self.colors['light gray'], font=self.font['cmd txt'], relief='groove')
-        self.fbdata.insert('end', 'Version: 1.1 | Built 1.26.22\n\n')
+        self.fbdata.insert('end', 'Version: 1.2 | Built 1.27.00\n\n')
         self.fbdata.configure(state='disabled')
         self.fbdata.place(anchor='n', relx=0.5, rely=0.07, relwidth=0.98, relheight=0.84)
 
@@ -58,27 +58,47 @@ class heliumUpdateGUI(tk.Tk):
                                     relief='groove', activebackground=self.colors['light gray'], command=self.update_but_func)
         self.update_but.bind('<Enter>', lambda event, x=self.update_but:self.on_hover(x))
         self.update_but.bind('<Leave>', lambda event, x=self.update_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.update_but.place(anchor='n', relx=0.3, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.update_but.place(anchor='n', relx=0.1, rely=0.92, relwidth=0.17, relheight=0.07)
         
         self.quagga_but = tk.Button(canvas,  text='2. Quagga Restart', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
                                     relief='groove', activebackground=self.colors['light gray'], command=self.quagga_but_func)
         self.quagga_but.bind('<Enter>', lambda event, x=self.quagga_but:self.on_hover(x))
         self.quagga_but.bind('<Leave>', lambda event, x=self.quagga_but, y=self.colors['but']:self.on_hover_leave(x, y))
-        self.quagga_but.place(anchor='n', relx=0.5, rely=0.92, relwidth=0.17, relheight=0.07)
+        self.quagga_but.place(anchor='n', relx=0.3, rely=0.92, relwidth=0.17, relheight=0.07)
 
         self.status_but = tk.Button(canvas,  text='3. Status', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
                                     relief='groove', activebackground=self.colors['light gray'], command=self.status_but_func)
         self.status_but.bind('<Enter>', lambda event, x=self.status_but:self.on_hover(x))
         self.status_but.bind('<Leave>', lambda event, x=self.status_but, y=self.colors['but']:self.on_hover_leave(x, y))
+        self.status_but.place(anchor='n', relx=0.5, rely=0.92, relwidth=0.17, relheight=0.07)
+
+        self.status_but = tk.Button(canvas,  text='4. Miner Info', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
+                                    relief='groove', activebackground=self.colors['light gray'], command=self.miner_info_func)
+        self.status_but.bind('<Enter>', lambda event, x=self.status_but:self.on_hover(x))
+        self.status_but.bind('<Leave>', lambda event, x=self.status_but, y=self.colors['but']:self.on_hover_leave(x, y))
         self.status_but.place(anchor='n', relx=0.7, rely=0.92, relwidth=0.17, relheight=0.07)
+
+        self.status_but = tk.Button(canvas,  text='5. Peer Book', font=self.font['bold'], bg=self.colors['but'], fg=self.colors['black'],
+                                    relief='groove', activebackground=self.colors['light gray'], command=self.run_peer_book_func)
+        self.status_but.bind('<Enter>', lambda event, x=self.status_but:self.on_hover(x))
+        self.status_but.bind('<Leave>', lambda event, x=self.status_but, y=self.colors['but']:self.on_hover_leave(x, y))
+        self.status_but.place(anchor='n', relx=0.9, rely=0.92, relwidth=0.17, relheight=0.07)
 
         iplb = tk.Label(canvas, text='Enter IP :', font=self.font['bold'], bg=self.colors['light gray'])
         iplb.place(anchor='n', relx=0.05, rely=0.005, relwidth=0.08, relheight=0.06)
 
-        init_ip = '192.168.1.X'
+        init_ip = '10.1.1.11'
         self.ipEntry = tk.Entry(canvas, font=self.font['bold'], justify='center', bg=self.colors['white'])
         self.ipEntry.insert('end', init_ip)
         self.ipEntry.place(anchor='n', relx=0.16, rely=0.012, relwidth=0.13, relheight=0.05)
+
+        iplb = tk.Label(canvas, text='SSH Port :', font=self.font['bold'], bg=self.colors['light gray'])
+        iplb.place(anchor='n', relx=0.30, rely=0.005, relwidth=0.08, relheight=0.06)
+
+        init_port = '22'
+        self.portEntry = tk.Entry(canvas, font=self.font['bold'], justify='center', bg=self.colors['white'])
+        self.portEntry.insert('end', init_port)
+        self.portEntry.place(anchor='n', relx=0.36, rely=0.012, relwidth=0.03, relheight=0.05)
 
         # add logo img
         logo = Image.open('assets/invibit.png')
@@ -126,6 +146,26 @@ class heliumUpdateGUI(tk.Tk):
             if self.conn_sequence() == None:
                 return
             self.tmpthread = threading.Thread(target=self.run_status_cmd)
+            self.tmpthread.daemon = True
+            self.tmpthread.start()
+        else:
+            self.throw_custom_error(title='Error', message='Another function already in progress. Please be patient.')
+
+    def miner_info_func(self):
+        if not self.s.is_alive():
+            if self.conn_sequence() == None:
+                return
+            self.tmpthread = threading.Thread(target=self.run_miner_info_cmd)
+            self.tmpthread.daemon = True
+            self.tmpthread.start()
+        else:
+            self.throw_custom_error(title='Error', message='Another function already in progress. Please be patient.')
+
+    def run_peer_book_func(self):
+        if not self.s.is_alive():
+            if self.conn_sequence() == None:
+                return
+            self.tmpthread = threading.Thread(target=self.run_peer_book_cmd)
             self.tmpthread.daemon = True
             self.tmpthread.start()
         else:
@@ -206,9 +246,27 @@ class heliumUpdateGUI(tk.Tk):
         self.update_fbdata(f'*** DONE ***\n')
         self.s.disconnect()
 
+    def run_miner_info_cmd(self):
+        cmd = 'docker exec miner miner info summary'
+        self.update_fbdata(f'${cmd}\n')
+        out, stderr = self.s.exec_cmd(cmd=cmd)
+        self.update_fbdata(out)
+        if stderr != '': self.update_fbdata(f'STDERR: {stderr}')
+        self.update_fbdata(f'*** DONE ***\n')
+        self.s.disconnect()
+
+    def run_peer_book_cmd(self):
+        cmd = 'docker exec miner miner peer book -s'
+        self.update_fbdata(f'${cmd}\n')
+        out, stderr = self.s.exec_cmd(cmd=cmd)
+        self.update_fbdata(out)
+        if stderr != '': self.update_fbdata(f'STDERR: {stderr}')
+        self.update_fbdata(f'*** DONE ***\n')
+        self.s.disconnect()
 
     def conn_sequence(self):
         addr = self.ipEntry.get()
+        port = self.portEntry.get()
         if addr[-1] == 'X':
             self.throw_custom_error(title='Error', message='Enter device IP address.')
             return None
@@ -216,8 +274,8 @@ class heliumUpdateGUI(tk.Tk):
             self.throw_custom_error(title='Error', message='Invalid IP address.')
             return None
         opts = self.read_config()
-        user, port, passwd = [opts[key] for key in ['username', 'port', 'password']]
-        if any([x==None for x in [user, port, passwd]]):
+        user, passwd = [opts[key] for key in ['username', 'password']]
+        if any([x==None for x in [user, passwd]]):
             self.throw_custom_error(title='Error', message='Error reading options.config file.')
             return None
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -260,14 +318,14 @@ class heliumUpdateGUI(tk.Tk):
         if os.path.isfile(self.optionspath) and os.path.getsize(self.optionspath) > 0:
             with open(self.optionspath, 'r') as f:
                 lines = f.readlines()
-            opts = {key:'' for key in ['username', 'port', 'password']}
+            opts = {key:'' for key in ['username', 'password']}
             for line in lines:
                 if any([x in line for x in opts.keys()]):
                     key, val = line.split('=')
                     opts[key] = val.strip()
             return opts
         else:
-            return {key:None for key in ['username', 'port', 'password']}
+            return {key:None for key in ['username', 'password']}
 
     def save(self):
         try:
