@@ -271,7 +271,7 @@ class heliumUpdateGUI(tk.Tk):
         addr = self.ipEntry.get()
         port = self.portEntry.get()
         if not self.valid_port(port):
-            self.throw_custom_error(title='Error', message='Invalid SSH port. Range : [0, 255].')
+            self.throw_custom_error(title='Error', message='Invalid SSH port. Range : [0, 65535].')
             return None
         if addr[-1] == 'X':
             self.throw_custom_error(title='Error', message='Enter device IP address.')
@@ -295,7 +295,7 @@ class heliumUpdateGUI(tk.Tk):
         connection = self.s.connect()
         self.clear_fbdata()
         if not self.s.is_alive() or connection == None:
-            self.update_fbdata('Connection Error.\nCheck username and password in options.config in files/ folder.')
+            self.update_fbdata('Connection Error.\nCheck username and password in options.config in config/ folder.')
             return None
         return True
 
