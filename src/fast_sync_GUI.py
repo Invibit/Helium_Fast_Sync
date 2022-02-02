@@ -101,7 +101,7 @@ class heliumUpdateGUI(tk.Tk):
         init_port = '22'
         self.portEntry = tk.Entry(canvas, font=self.font['bold'], justify='center', bg=self.colors['white'])
         self.portEntry.insert('end', init_port)
-        self.portEntry.place(anchor='n', relx=0.334, rely=0.012, relwidth=0.05, relheight=0.05)
+        self.portEntry.place(anchor='n', relx=0.345, rely=0.012, relwidth=0.07, relheight=0.05)
 
         # add logo img
         logo = Image.open('assets/invibit.png')
@@ -239,6 +239,7 @@ class heliumUpdateGUI(tk.Tk):
         self.update_fbdata(f'*** DONE ***\n')
         self.s.disconnect()
 
+
     def run_status_cmd(self):
         cmd = 'docker exec miner miner info p2p_status'
         self.update_fbdata(f'${cmd}\n')
@@ -322,7 +323,7 @@ class heliumUpdateGUI(tk.Tk):
     def valid_port(self, port):
         try:
             port = int(port)
-            return (port >= 0 and port <=255)
+            return (port >= 0 and port <=65535)
         except:
             return False
 
