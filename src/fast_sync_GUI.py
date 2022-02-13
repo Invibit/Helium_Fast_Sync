@@ -189,9 +189,9 @@ class heliumUpdateGUI(tk.Tk):
         height = '** ERROR WHILE EXECUTING CURL CMD **'
         cmds = ['docker exec miner miner repair sync_pause',
                 'docker exec miner miner repair sync_cancel',
-                'curl https://helium-snapshots.nebra.com/latest.json',
+                'curl http://snapshots-wtf.sensecapmx.cloud/latest-snap.json',
                 'cd /mnt/mmcblk0p1/miner_data/snap && rm snap-*',
-                'cd /mnt/mmcblk0p1/miner_data/snap && wget https://helium-snapshots.nebra.com/snap-',
+                'cd /mnt/mmcblk0p1/miner_data/snap && wget http://snapshots-wtf.sensecapmx.cloud/snap-',
                 'docker exec miner miner snapshot load /var/data/snap/snap- &',
                 'docker exec miner miner repair sync_state',
                 'docker exec miner miner repair sync_resume']
@@ -219,7 +219,7 @@ class heliumUpdateGUI(tk.Tk):
                     if idx == 4: stderr = '\n'.join(stderr.split('\n')[:13])+'\n'+' '*30+'..........\n'+'\n'.join(stderr.split('\n')[-10:])
                     self.update_fbdata(f'STDERR: {stderr}')
                 if idx == 2: # curl
-                    height = out.split('height": ')[1].split(',')[0]
+                    height = out.split('height":')[1].split('}')[0]
                 elif idx == 6: # sync_state
                     do_sync_resume = 'sync active' not in out
 
@@ -241,11 +241,24 @@ class heliumUpdateGUI(tk.Tk):
 
 
     def run_status_cmd(self):
-        cmd = 'docker exec miner miner info p2p_status'
-        self.update_fbdata(f'${cmd}\n')
-        out, stderr = self.s.exec_cmd(cmd=cmd)
-        self.update_fbdata(out)
-        if stderr != '': self.update_fbdata(f'STDERR: {stderr}')
+        cmds = ['docker exec miner miner info p2p_status',
+                'curl http://snapshots-wtf.sensecapmx.cloud/latest-snap.json']
+        self.update_fbdata(f'${cmds[0]}\n')
+        for idx, cmd in enumerate(cmds):
+            out, stderr = self.s.exec_cmd(cmd=cmd)
+            if idx == 0:
+                self.update_fbdata(out)
+                if stderr != '': self.update_fbdata(f'STDERR: {stderr}')
+                miner_height = int(out.split('height')[1].split('|')[1].split('|')[0])
+            elif idx == 1:
+                blockchain_height = int(out.split('height":')[1].split('}')[0])
+        diff = miner_height - blockchain_height
+        if diff > 0:
+            self.update_fbdata(f'-> Miner {diff} blocks ahead of the blockchain! (SYNCED)\n')
+        elif diff < 0:
+            self.update_fbdata(f'-> Miner trailing {diff} blocks behind the blockchain. (SYNCING)\n')
+        else:
+            self.update_fbdata(f'-> Miner in complete sync with the blockchain! (SYNCED)\n')
         self.update_fbdata(f'*** DONE ***\n')
         self.s.disconnect()
 
