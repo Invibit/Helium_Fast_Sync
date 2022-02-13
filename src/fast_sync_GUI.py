@@ -46,7 +46,7 @@ class heliumUpdateGUI(tk.Tk):
         canvas.pack(fill='both', expand=True)
 
         self.fbdata = tk.Text(canvas, bg=self.colors['white'], font=self.font['cmd txt'], relief='groove')
-        self.fbdata.insert('end', '   Version: 1.2 | Built 01.02.22\n\n')
+        self.fbdata.insert('end', '   Version: 1.3 | Built 13.02.22\n\n')
         self.fbdata.configure(state='disabled')
         self.fbdata.place(anchor='n', relx=0.5, rely=0.07, relwidth=0.98, relheight=0.84)
 
@@ -242,7 +242,7 @@ class heliumUpdateGUI(tk.Tk):
 
     def run_status_cmd(self):
         cmds = ['docker exec miner miner info p2p_status',
-                'curl http://snapshots-wtf.sensecapmx.cloud/latest-snap.json']
+                'curl -k --connect-timeout 10 https://api.helium.io/v1/blocks/height']
         self.update_fbdata(f'${cmds[0]}\n')
         for idx, cmd in enumerate(cmds):
             out, stderr = self.s.exec_cmd(cmd=cmd)
